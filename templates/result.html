@@ -22,7 +22,7 @@
 
         /* Container styling */
         .container {
-            background-color: rgba(255, 255, 255, 0.85);
+            background-color: rgba(255, 255, 255, 0.9);
             padding: 40px;
             border-radius: 15px;
             margin-top: 100px;
@@ -69,18 +69,22 @@
             border-radius: 10px;
         }
 
-        /* GIF styling */
-        .gif, .gif1 {
-            width: 100%;
-            max-width: 400px;
+        /* Summary Table */
+        .summary-table {
             margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        /* Footer */
-        .footer-description {
-            color: #555;
-            margin-top: 30px;
-            font-size: 0.9rem;
+        .summary-table th, .summary-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .summary-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
         }
 
         /* Button styling */
@@ -125,37 +129,48 @@
 
         <!-- Result -->
         <div class="results mt-5">
-            {% if prediction == 1 %}
+            {% if prediction == "High Risk of Stroke" %}
             <!-- Bad result (Stroke detected) -->
             <div class="danger-box">
-                <h1 class="danger">We are sorry to inform you that you are at risk of a stroke.</h1>
-                <p class="mt-3">It is recommended to consult a healthcare professional immediately to take preventive measures. Early diagnosis can significantly improve outcomes.</p>
-                <img class="gif" src="{{ url_for('static', filename='no.gif') }}" alt="STROKE Image">
+                <h1 class="danger">High Risk of Stroke Detected</h1>
+                <p class="mt-3">It is recommended to consult a healthcare professional immediately for further evaluation and preventive measures.</p>
             </div>
 
-            {% elif prediction == 0 %}
+            {% else %}
             <!-- Good result (No stroke detected) -->
             <div class="safe-box">
-                <h1 class="safe">Good News! You are not at risk of a stroke.</h1>
-                <p class="mt-3">Keep maintaining a healthy lifestyle to lower the chances of a stroke in the future. Regular check-ups can help stay on top of your health.</p>
-                <img class="gif1" src="{{ url_for('static', filename='yes.webp') }}" alt="Not STROKE Image">
+                <h1 class="safe">Low Risk of Stroke Detected</h1>
+                <p class="mt-3">You are at low risk of stroke. Maintain a healthy lifestyle and regular check-ups to stay healthy.</p>
             </div>
 
             {% endif %}
         </div>
 
+        <!-- User Input Summary -->
+        <h3 class="mt-5">Your Input Summary</h3>
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in user_input.items() %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
         <!-- Check Again Button -->
-        <a href="{{ url_for('prediction_page') }}" class="check-again-btn">Check Again</a>
+        <a href="{{ url_for('prediction') }}" class="check-again-btn">Check Again</a>
 
         <!-- Footer -->
         <div class="text-center mt-4">
-            <p>
-              © 2024 Stroke Prediction Project by
-              <a href="mailto:ishubtripathi@gmail.com" class="copyfooter"
-                ><span>Shubh Tripathi.</span></a
-              >
-              All rights reserved.
-            </p>
+            <p>&copy; 2024 HeartcureAI. All rights reserved.</p>
         </div>
     </div>
 

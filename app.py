@@ -5,10 +5,11 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# Load trained model, scaler, and encoders
+# Load trained model, scaler, encoders, and feature names
 model = joblib.load("model/stroke_model.pkl")
 scaler = joblib.load("model/scaler.pkl")
 label_encoders = joblib.load("model/label_encoders.pkl")
+feature_names = joblib.load("model/feature_names.pkl")
 
 @app.route('/', methods=['GET'])
 def home():
@@ -39,13 +40,15 @@ def predict():
             "Age": float(request.form['age']),
             "Hypertension": int(request.form['hypertension']),
             "Heart Disease": int(request.form['heart_disease']),
-            "Marital Status": request.form['ever_married'],
-            "Residence Type": request.form['Residence_type'],
-            "Avg Glucose Level": float(request.form['avg_glucose_level']),
-            "BMI": float(request.form['bmi']),
+            "Marital Status": request.form['marital_status'],
+            "Residence Type": request.form['residence_type'],
+            "Average Glucose Level": float(request.form['avg_glucose_level']),  # Corrected key
+            "Body Mass Index (BMI)": float(request.form['bmi']),  # Corrected key
             "Smoking Status": request.form['smoking_status'],
-            "Alcohol Intake": request.form.get('alcohol_intake', "No"),  # Default "No"
-            "Physical Activity": request.form.get('physical_activity', "Low")  # Default "Low"
+            "Alcohol Intake": request.form['alcohol_intake'],
+            "Physical Activity": request.form['physical_activity'],
+            "Stroke History": int(request.form.get('stroke_history', 0)),  # Default to 0 if not provided
+            "Family History of Stroke": int(request.form.get('family_history', 0))  # Default to 0 if not provided
         }
         
         # Encode categorical variables
@@ -55,6 +58,9 @@ def predict():
 
         # Convert input to a DataFrame
         input_df = pd.DataFrame([user_input])
+
+        # Reorder columns to match the training data
+        input_df = input_df[feature_names]  # Use saved feature names
         
         # Standardize numerical values
         input_df_scaled = scaler.transform(input_df)
@@ -63,7 +69,7 @@ def predict():
         prediction = model.predict(input_df_scaled)
         result = "High Risk of Stroke" if prediction[0] == 1 else "Low Risk of Stroke"
 
-        return render_template('result.html', prediction=result)
+        return render_template('result.html', prediction=result, user_input=user_input)
     except Exception as e:
         return f"Error: {e}", 400
 

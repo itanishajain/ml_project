@@ -67,4 +67,7 @@ joblib.dump(model, "model/stroke_model.pkl")
 joblib.dump(scaler, "model/scaler.pkl")
 joblib.dump(label_encoders, "model/label_encoders.pkl")
 
+# Save feature names in the correct order
+joblib.dump(X.columns.tolist(), "model/feature_names.pkl")
+
 print("✅ Model trained and saved successfully!")
