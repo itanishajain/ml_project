@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features - HeartcureAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-heart"></i>
+                <span>HeartcureAI</span>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('about') }}">About</a></li>
+                <li><a href="{{ url_for('features') }}" class="active">Features</a></li>
+                <li><a href="{{ url_for('prediction') }}">Demo</a></li>
+                <li><a href="{{ url_for('contact') }}">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Features Hero -->
+    <section class="page-hero">
+        <div class="container">
+            <h1>Our Features</h1>
+            <p>Discover what makes HeartcureAI unique</p>
+        </div>
+    </section>
+
+    <!-- Main Features -->
+    <section class="main-features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card large">
+                    <i class="fas fa-brain"></i>
+                    <h3>Advanced AI Model</h3>
+                    <p>Our sophisticated machine learning algorithms are trained on extensive medical data, providing highly accurate stroke risk predictions.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Deep learning architecture</li>
+                        <li><i class="fas fa-check"></i> Continuous model improvement</li>
+                        <li><i class="fas fa-check"></i> Multi-factor analysis</li>
+                    </ul>
+                </div>
+                <div class="feature-card large">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Real-time Analytics</h3>
+                    <p>Get instant insights and risk assessments with our powerful real-time processing engine.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Instant risk assessment</li>
+                        <li><i class="fas fa-check"></i> Detailed reports</li>
+                        <li><i class="fas fa-check"></i> Trend analysis</li>
+                    </ul>
+                </div>
+                <div class="feature-card large">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Data Security</h3>
+                    <p>Your data is protected with enterprise-grade security measures and HIPAA compliance.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> End-to-end encryption</li>
+                        <li><i class="fas fa-check"></i> HIPAA compliant</li>
+                        <li><i class="fas fa-check"></i> Regular security audits</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Features -->
+    <section class="technical-features">
+        <div class="container">
+            <h2>Technical Specifications</h2>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <h3>Model Architecture</h3>
+                    <ul>
+                        <li>Deep Neural Networks</li>
+                        <li>Ensemble Learning</li>
+                        <li>Feature Engineering</li>
+                    </ul>
+                </div>
+                <div class="tech-item">
+                    <h3>Integration</h3>
+                    <ul>
+                        <li>REST API</li>
+                        <li>WebSocket Support</li>
+                        <li>Custom Webhooks</li>
+                    </ul>
+                </div>
+                <div class="tech-item">
+                    <h3>Performance</h3>
+                    <ul>
+                        <li>95% Accuracy</li>
+                        <li>Low Latency</li>
+                        <li>Scalable Infrastructure</li>
+                    </ul>
+                </div>
+                <div class="tech-item">
+                    <h3>Compliance</h3>
+                    <ul>
+                        <li>HIPAA</li>
+                        <li>GDPR</li>
+                        <li>ISO 27001</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <i class="fas fa-heart"></i>
+                        <span>HeartcureAI</span>
+                    </div>
+                    <p>Revolutionizing heart health prediction with artificial intelligence.</p>
+                    <div class="social-links">
+                        <a href="https://github.com/ishubtripathi" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/ishubtripathi/" target="_blank">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="https://x.com/Ishubtripathi" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="features.html">Features</a></li>
+                        <li><a href="demo.html">Try Demo</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contact Us</h3>
+                    <p>
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:contact@heartcureai.com">contact@heartcureai.com</a>
+                    </p>
+                    <p>
+                        <i class="fas fa-phone"></i>
+                        <a href="tel:+1234567890">+1 (234) 567-890</a>
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 HeartcureAI by Shubh Tripathi. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

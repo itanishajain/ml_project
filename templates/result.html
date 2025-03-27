@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stroke Prediction Result</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        /* Background Image */
+        body {
+            background-image: url("{{ url_for('static', filename='images/stroke.jpg') }}");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+
+        /* Container styling */
+        .container {
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 40px;
+            border-radius: 15px;
+            margin-top: 100px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+        }
+
+        /* Heading Font */
+        .heading_font {
+            color: #333;
+            font-family: 'Pacifico', cursive;
+            font-size: 50px;
+            letter-spacing: 1px;
+        }
+
+        /* Result Styling */
+        .results h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Bad result */
+        .danger {
+            color: #ff4d4d;
+        }
+
+        .danger-box {
+            background-color: rgba(255, 77, 77, 0.1);
+            border-left: 5px solid #ff4d4d;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        /* Good result */
+        .safe {
+            color: #28a745;
+        }
+
+        .safe-box {
+            background-color: rgba(40, 167, 69, 0.1);
+            border-left: 5px solid #28a745;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        /* GIF styling */
+        .gif, .gif1 {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 20px;
+        }
+
+        /* Footer */
+        .footer-description {
+            color: #555;
+            margin-top: 30px;
+            font-size: 0.9rem;
+        }
+
+        /* Button styling */
+        .check-again-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 30px;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        .check-again-btn:hover {
+            background-color: #0056b3;
+            text-decoration: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .heading_font {
+                font-size: 40px;
+            }
+
+            .results h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                margin-top: 50px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container text-center">
+        <h2 class="heading_font">Stroke Prediction Result</h2>
+
+        <!-- Result -->
+        <div class="results mt-5">
+            {% if prediction == 1 %}
+            <!-- Bad result (Stroke detected) -->
+            <div class="danger-box">
+                <h1 class="danger">We are sorry to inform you that you are at risk of a stroke.</h1>
+                <p class="mt-3">It is recommended to consult a healthcare professional immediately to take preventive measures. Early diagnosis can significantly improve outcomes.</p>
+                <img class="gif" src="{{ url_for('static', filename='no.gif') }}" alt="STROKE Image">
+            </div>
+
+            {% elif prediction == 0 %}
+            <!-- Good result (No stroke detected) -->
+            <div class="safe-box">
+                <h1 class="safe">Good News! You are not at risk of a stroke.</h1>
+                <p class="mt-3">Keep maintaining a healthy lifestyle to lower the chances of a stroke in the future. Regular check-ups can help stay on top of your health.</p>
+                <img class="gif1" src="{{ url_for('static', filename='yes.webp') }}" alt="Not STROKE Image">
+            </div>
+
+            {% endif %}
+        </div>
+
+        <!-- Check Again Button -->
+        <a href="{{ url_for('prediction_page') }}" class="check-again-btn">Check Again</a>
+
+        <!-- Footer -->
+        <div class="text-center mt-4">
+            <p>
+              © 2024 Stroke Prediction Project by
+              <a href="mailto:ishubtripathi@gmail.com" class="copyfooter"
+                ><span>Shubh Tripathi.</span></a
+              >
+              All rights reserved.
+            </p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
