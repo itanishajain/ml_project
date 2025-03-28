@@ -59,11 +59,11 @@
                 Start Assessment
                 <i class="fas fa-arrow-right"></i>
               </a>
-              <a href="about.html" class="btn btn-outline">Learn More</a>
+              <a href="{{ url_for('features') }}" class="btn btn-outline">Learn More</a>
             </div>
           </div>
           <div class="hero-image">
-            <i class="fas fa-brain floating"></i>
+            <img src="{{ url_for('static', filename='img/heart.png') }}" alt="Metal Heart" class="floating" style="width: 350px; height: auto;" />
           </div>
         </div>
       </div>
@@ -75,7 +75,7 @@
         <div class="overview-grid">
           <div class="overview-card">
             <i class="fas fa-chart-line"></i>
-            <h3>95% Accuracy</h3>
+            <h3>90% Accuracy</h3>
             <p>High precision in stroke risk prediction</p>
           </div>
           <div class="overview-card">
@@ -186,7 +186,7 @@
           </div>
         </div>
         <div class="footer-bottom">
-          <p>&copy; 2024 HeartcureAI. All rights reserved.</p>
+          <p>&copy; 2025 HeartcureAI. All rights reserved.</p>
         </div>
       </div>
     </footer>

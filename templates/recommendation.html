@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendations</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .heading {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #007bff;
+        }
+
+        .recommendation-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .recommendation-item {
+            background: #e9ecef;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .recommendation-item h5 {
+            margin: 0 0 5px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .recommendation-item p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="heading">Personalized Recommendations</h1>
+        <ul class="recommendation-list" id="recommendation-list">
+            <!-- Recommendations will be dynamically inserted here -->
+        </ul>
+        <a href="{{ url_for('result') }}" class="back-btn">Back to Results</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const recommendationList = document.getElementById('recommendation-list');
+
+            try {
+                // Fetch recommendations from the backend
+                const response = await fetch('/api/gemini-recommendations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prediction: "{{ prediction }}",
+                        user_input: {{ user_input | tojson }}
+                    }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    data.recommendations.forEach((rec) => {
+                        const li = document.createElement('li');
+                        li.className = 'recommendation-item';
+                        li.innerHTML = `<h5>${rec.title}</h5><p>${rec.description}</p>`;
+                        recommendationList.appendChild(li);
+                    });
+                } else {
+                    recommendationList.innerHTML = '<li class="recommendation-item">Failed to load recommendations. Please try again later.</li>';
+                }
+            } catch (error) {
+                console.error('Error fetching recommendations:', error);
+                recommendationList.innerHTML = '<li class="recommendation-item">An error occurred. Please try again later.</li>';
+            }
+        });
+    </script>
+</body>
+
+</html>

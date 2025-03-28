@@ -159,7 +159,31 @@
                 {% for key, value in user_input.items() %}
                 <tr>
                     <td>{{ key }}</td>
-                    <td>{{ value }}</td>
+                    <td>
+                        {% if key == 'gender' %}
+                            {{ 'Male' if value == '1' else 'Female' }}
+                        {% elif key == 'hypertension' %}
+                            {{ 'Yes' if value == '1' else 'No' }}
+                        {% elif key == 'heart_disease' %}
+                            {{ 'Yes' if value == '1' else 'No' }}
+                        {% elif key == 'marital_status' %}
+                            {{ 'Married' if value == '1' else 'Single' }}
+                        {% elif key == 'residence_type' %}
+                            {{ 'Urban' if value == '1' else 'Rural' }}
+                        {% elif key == 'smoking_status' %}
+                            {{ 'Non-smoker' if value == '0' else 'Currently Smokes' if value == '1' else 'Formerly Smoked' }}
+                        {% elif key == 'alcohol_intake' %}
+                            {{ 'Never' if value == '0' else 'Rarely' if value == '1' else 'Social Drinker' if value == '2' else 'Frequent Drinker' }}
+                        {% elif key == 'physical_activity' %}
+                            {{ 'Low' if value == '0' else 'Moderate' if value == '1' else 'High' }}
+                        {% elif key == 'stroke_history' %}
+                            {{ 'Yes' if value == '1' else 'No' }}
+                        {% elif key == 'family_history' %}
+                            {{ 'Yes' if value == '1' else 'No' }}
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -170,7 +194,7 @@
 
         <!-- Footer -->
         <div class="text-center mt-4">
-            <p>&copy; 2024 HeartcureAI. All rights reserved.</p>
+            <p>&copy; 2025 HeartcureAI. All rights reserved.</p>
         </div>
     </div>
 
@@ -178,7 +202,5 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
 </body>
-
 </html>
