@@ -43,7 +43,6 @@ def predict():
             "Heart Disease": int(request.form['heart_disease']),
             "Marital Status": request.form['marital_status'],
             "Residence Type": request.form['residence_type'],
-            "Average Glucose Level": float(request.form['avg_glucose_level']),  # Corrected key
             "Body Mass Index (BMI)": float(request.form['bmi']),  # Corrected key
             "Smoking Status": request.form['smoking_status'],
             "Alcohol Intake": request.form['alcohol_intake'],
