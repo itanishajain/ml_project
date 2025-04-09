@@ -1,206 +1,638 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stroke Prediction Result</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* Background Image */
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background-image: url("{{ url_for('static', filename='images/stroke.jpg') }}");
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            line-height: 1.5;
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
+            padding: 3rem 1rem;
+            font-size: 16px;
         }
 
-        /* Container styling */
         .container {
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 40px;
-            border-radius: 15px;
-            margin-top: 100px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            max-width: 800px;
+            max-width: 64rem;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 2rem;
         }
 
-        /* Heading Font */
-        .heading_font {
-            color: #333;
-            font-family: 'Pacifico', cursive;
-            font-size: 50px;
-            letter-spacing: 1px;
-        }
-
-        /* Result Styling */
-        .results h1 {
+        h1 {
             font-size: 2.5rem;
             font-weight: bold;
-            color: #333;
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 2rem;
         }
 
-        /* Bad result */
-        .danger {
-            color: #ff4d4d;
+        h2 {
+            font-size: 1.75rem;
+            margin-bottom: 0.75rem;
         }
 
-        .danger-box {
-            background-color: rgba(255, 77, 77, 0.1);
-            border-left: 5px solid #ff4d4d;
-            padding: 20px;
-            border-radius: 10px;
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
         }
 
-        /* Good result */
-        .safe {
-            color: #28a745;
+        p {
+            font-size: 1.125rem;
+            line-height: 1.6;
         }
 
-        .safe-box {
-            background-color: rgba(40, 167, 69, 0.1);
-            border-left: 5px solid #28a745;
-            padding: 20px;
-            border-radius: 10px;
+        /* Result box styles */
+        .result-box {
+            padding: 2rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2.5rem;
         }
 
-        /* Summary Table */
-        .summary-table {
-            margin-top: 20px;
+        .result-box.safe {
+            background-color: #ecfdf5;
+            border: 1px solid #a7f3d0;
+        }
+
+        .result-box.safe h2 {
+            color: #047857;
+        }
+
+        .result-box.safe p {
+            color: #065f46;
+        }
+
+        .result-box.danger {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        .result-box.danger h2 {
+            color: #b91c1c;
+        }
+
+        .result-box.danger p {
+            color: #991b1b;
+        }
+
+        /* Summary section styles */
+        .summary-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .summary-box {
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+            padding: 2rem;
+        }
+
+        /* Tips section styles */
+        .tips-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .tips-box {
+            padding: 2rem;
+            border-radius: 0.5rem;
+        }
+
+        .tips-box.safe {
+            background-color: #ecfdf5;
+            border: 1px solid #a7f3d0;
+        }
+
+        .tips-box.danger {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        .tips-box ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .tips-box li {
+            margin-bottom: 1rem;
+            padding-left: 1.75rem;
+            position: relative;
+            font-size: 1.125rem;
+        }
+
+        .tips-box li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #047857;
+            font-size: 1.25rem;
+        }
+
+        .tips-box.danger li:before {
+            color: #b91c1c;
+        }
+
+        table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        .summary-table th, .summary-table td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: left;
+        tr {
+            border-bottom: 1px solid #e5e7eb;
         }
 
-        .summary-table th {
-            background-color: #f8f9fa;
-            font-weight: bold;
+        tr:last-child {
+            border-bottom: none;
         }
 
-        /* Button styling */
-        .check-again-btn {
-            background-color: #007bff;
+        td {
+            padding: 1rem 0;
+            font-size: 1.125rem;
+        }
+
+        td.label {
+            font-weight: 500;
+            color: #4b5563;
+        }
+
+        /* Chart section styles */
+        .chart-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .chart-box {
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+            padding: 2rem;
+        }
+
+        /* Button styles */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn svg {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        .btn-red {
+            background-color: #dc2626;
             color: white;
-            padding: 10px 20px;
+        }
+
+        .btn-red:hover {
+            background-color: #b91c1c;
+        }
+
+        .btn-green {
+            background-color: #059669;
+            color: white;
+        }
+
+        .btn-green:hover {
+            background-color: #047857;
+        }
+
+        .btn-blue {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .btn-blue:hover {
+            background-color: #2563eb;
+        }
+
+        /* Footer styles */
+        footer {
+            text-align: center;
+            color: #6b7280;
             font-size: 1rem;
-            border-radius: 5px;
-            text-decoration: none;
-            margin-top: 30px;
-            display: inline-block;
-            transition: background-color 0.3s ease;
+            margin-top: 2.5rem;
         }
 
-        .check-again-btn:hover {
-            background-color: #0056b3;
-            text-decoration: none;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .heading_font {
-                font-size: 40px;
+        @media print {
+            .container {
+                margin: 0;
+                padding: 30px;
+                box-shadow: none;
             }
+            
+            .no-print {
+                display: none;
+            }
+            
+            body {
+                background: white;
+                padding: 0;
+                font-size: 14pt;
+            }
+            
+            .chart-box {
+                page-break-inside: avoid;
+            }
+            
+            .summary-section {
+                page-break-inside: avoid;
+            }
+            
+            .tips-section {
+                page-break-inside: avoid;
+            }
+        }
 
-            .results h1 {
-                font-size: 2rem;
+        /* Responsive design */
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
             }
 
             .container {
-                margin-top: 50px;
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
 </head>
-
 <body>
+    <div class="container" id="capture-container">
+        <h1>Stroke Prediction Result</h1>
 
-    <div class="container text-center">
-        <h2 class="heading_font">Stroke Prediction Result</h2>
-
-        <!-- Result -->
-        <div class="results mt-5">
-            {% if prediction == "High Risk of Stroke" %}
-            <!-- Bad result (Stroke detected) -->
-            <div class="danger-box">
-                <h1 class="danger">High Risk of Stroke Detected</h1>
-                <p class="mt-3">It is recommended to consult a healthcare professional immediately for further evaluation and preventive measures.</p>
-            </div>
-
-            {% else %}
-            <!-- Good result (No stroke detected) -->
-            <div class="safe-box">
-                <h1 class="safe">Low Risk of Stroke Detected</h1>
-                <p class="mt-3">You are at low risk of stroke. Maintain a healthy lifestyle and regular check-ups to stay healthy.</p>
-            </div>
-
-            {% endif %}
+        <div class="result-box safe">
+            <h2>Low Risk of Stroke Detected</h2>
+            <p>You are at low risk of stroke. Maintain a healthy lifestyle and regular check-ups to stay healthy.</p>
         </div>
 
-        <!-- User Input Summary -->
-        <h3 class="mt-5">Your Input Summary</h3>
-        <table class="summary-table">
-            <thead>
-                <tr>
-                    <th>Feature</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for key, value in user_input.items() %}
-                <tr>
-                    <td>{{ key }}</td>
-                    <td>
-                        {% if key == 'gender' %}
-                            {{ 'Male' if value == '1' else 'Female' }}
-                        {% elif key == 'hypertension' %}
-                            {{ 'Yes' if value == '1' else 'No' }}
-                        {% elif key == 'heart_disease' %}
-                            {{ 'Yes' if value == '1' else 'No' }}
-                        {% elif key == 'marital_status' %}
-                            {{ 'Married' if value == '1' else 'Single' }}
-                        {% elif key == 'residence_type' %}
-                            {{ 'Urban' if value == '1' else 'Rural' }}
-                        {% elif key == 'smoking_status' %}
-                            {{ 'Non-smoker' if value == '0' else 'Currently Smokes' if value == '1' else 'Formerly Smoked' }}
-                        {% elif key == 'alcohol_intake' %}
-                            {{ 'Never' if value == '0' else 'Rarely' if value == '1' else 'Social Drinker' if value == '2' else 'Frequent Drinker' }}
-                        {% elif key == 'physical_activity' %}
-                            {{ 'Low' if value == '0' else 'Moderate' if value == '1' else 'High' }}
-                        {% elif key == 'stroke_history' %}
-                            {{ 'Yes' if value == '1' else 'No' }}
-                        {% elif key == 'family_history' %}
-                            {{ 'Yes' if value == '1' else 'No' }}
-                        {% else %}
-                            {{ value }}
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <!-- Check Again Button -->
-        <a href="{{ url_for('prediction') }}" class="check-again-btn">Check Again</a>
-
-        <!-- Footer -->
-        <div class="text-center mt-4">
-            <p>&copy; 2025 HeartcureAI. All rights reserved.</p>
+        <div class="summary-section">
+            <h3>Your Input Summary</h3>
+            <div class="summary-box">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td class="label">Gender</td>
+                            <td>Male</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Age</td>
+                            <td>45</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Hypertension</td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Heart Disease</td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Marital Status</td>
+                            <td>Married</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Residence Type</td>
+                            <td>Urban</td>
+                        </tr>
+                        <tr>
+                            <td class="label">BMI</td>
+                            <td>24.5</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Smoking Status</td>
+                            <td>Non-smoker</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Alcohol Intake</td>
+                            <td>Social Drinker</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Physical Activity</td>
+                            <td>Moderate</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Stroke History</td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Family History</td>
+                            <td>No</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
+
+        <div class="tips-section">
+            <h3>Personalized Health Tips</h3>
+            <div class="tips-box safe">
+                <ul>
+                    <li>Keep up the healthy lifestyle!</li>
+                    <li>Continue with regular exercise.</li>
+                    <li>Avoid smoking and excessive alcohol use.</li>
+                    <li>Maintain a balanced diet and hydrate well.</li>
+                    <li>Get routine health checkups for prevention.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <h3>Health Indicators</h3>
+            <div class="chart-box">
+                <canvas id="healthChart"></canvas>
+            </div>
+        </div>
+
+        <div class="button-group no-print">
+            <button onclick="downloadPDF()" class="btn btn-red">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download PDF
+            </button>
+            <button onclick="downloadImage()" class="btn btn-green">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                Download Image
+            </button>
+            <button onclick="checkAgain()" class="btn btn-blue">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 2v6h-6"></path>
+                    <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                    <path d="M3 22v-6h6"></path>
+                    <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                </svg>
+                Check Again
+            </button>
+        </div>
+
+        <footer class="no-print">
+            © 2025 HeartcureAI. All rights reserved.
+        </footer>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Initialize Chart.js
+        const ctx = document.getElementById('healthChart').getContext('2d');
+
+        const chartData = {
+            labels: [
+                'Hypertension',
+                'Heart Disease',
+                'BMI',
+                'Physical Activity',
+                'Smoking Risk',
+                'Alcohol Risk',
+                'Age Risk',
+                'Family History'
+            ],
+            datasets: [{
+                label: 'Health Indicators',
+                data: [0.2, 0.3, 0.6, 0.8, 0.1, 0.4, 0.5, 0.2],
+                backgroundColor: '#dc2626',
+                borderRadius: 10
+            }]
+        };
+
+        const chartOptions = {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: { color: 'black' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 1,
+                    ticks: {
+                        callback: function(value) {
+                            return (value * 100) + '%';
+                        }
+                    }
+                }
+            },
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem) {
+                        return `Risk Level: ${(tooltipItem.value * 100).toFixed(1)}%`;
+                    }
+                }
+            }
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: chartOptions
+        });
+
+        async function downloadImage() {
+            const element = document.getElementById('capture-container');
+            
+            try {
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    useCORS: true
+                });
+                
+                const link = document.createElement('a');
+                link.download = 'stroke_result.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (error) {
+                console.error('Error generating image:', error);
+                alert('Failed to generate image. Please try again.');
+            }
+        }
+
+        async function downloadPDF() {
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                // A4 dimensions in mm
+                const pageWidth = 210;
+                const pageHeight = 297;
+                const margin = 25; // Increased margin for better readability
+
+                // Add title to first page
+                pdf.setFontSize(28); // Increased font size
+                pdf.setTextColor(0);
+                const title = 'Stroke Prediction Result';
+                const titleWidth = pdf.getStringUnitWidth(title) * pdf.getFontSize() / pdf.internal.scaleFactor;
+                const titleX = (pageWidth - titleWidth) / 2;
+                pdf.text(title, titleX, margin + 10);
+
+                // Capture and add the result box
+                const resultElement = document.querySelector('.result-box');
+                const resultCanvas = await html2canvas(resultElement, {
+                    scale: 3, // Increased scale for better quality
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    useCORS: true
+                });
+
+                const resultRatio = resultCanvas.height / resultCanvas.width;
+                const resultWidth = pageWidth - (2 * margin);
+                const resultHeight = resultWidth * resultRatio;
+
+                pdf.addImage(
+                    resultCanvas.toDataURL('image/png'),
+                    'PNG',
+                    margin,
+                    margin + 20,
+                    resultWidth,
+                    resultHeight
+                );
+
+                // Capture and add the summary section
+                const summaryElement = document.querySelector('.summary-section');
+                const summaryCanvas = await html2canvas(summaryElement, {
+                    scale: 3, // Increased scale for better quality
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    useCORS: true
+                });
+
+                const summaryRatio = summaryCanvas.height / summaryCanvas.width;
+                const summaryWidth = pageWidth - (2 * margin);
+                const summaryHeight = summaryWidth * summaryRatio;
+
+                pdf.addImage(
+                    summaryCanvas.toDataURL('image/png'),
+                    'PNG',
+                    margin,
+                    margin + 20 + resultHeight + 15,
+                    summaryWidth,
+                    summaryHeight
+                );
+
+                // Add page 2
+                pdf.addPage();
+
+                // Capture and add the tips section
+                const tipsElement = document.querySelector('.tips-section');
+                const tipsCanvas = await html2canvas(tipsElement, {
+                    scale: 3, // Increased scale for better quality
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    useCORS: true
+                });
+
+                const tipsRatio = tipsCanvas.height / tipsCanvas.width;
+                const tipsWidth = pageWidth - (2 * margin);
+                const tipsHeight = tipsWidth * tipsRatio;
+
+                pdf.addImage(
+                    tipsCanvas.toDataURL('image/png'),
+                    'PNG',
+                    margin,
+                    margin,
+                    tipsWidth,
+                    tipsHeight
+                );
+
+                // Capture and add the chart section
+                const chartElement = document.querySelector('.chart-section');
+                const chartCanvas = await html2canvas(chartElement, {
+                    scale: 3, // Increased scale for better quality
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    useCORS: true
+                });
+
+                const chartRatio = chartCanvas.height / chartCanvas.width;
+                const chartWidth = pageWidth - (2 * margin);
+                const chartHeight = chartWidth * chartRatio;
+
+                pdf.addImage(
+                    chartCanvas.toDataURL('image/png'),
+                    'PNG',
+                    margin,
+                    margin + tipsHeight + 15,
+                    chartWidth,
+                    chartHeight
+                );
+
+                // Add footer to both pages
+                const footerText = 'Generated by HeartCure.AI';
+                pdf.setFontSize(12); // Increased footer font size
+                pdf.setTextColor(100);
+                const textWidth = pdf.getStringUnitWidth(footerText) * 12 / pdf.internal.scaleFactor;
+                const footerX = (pageWidth - textWidth) / 2;
+                const footerY = pageHeight - 15;
+
+                // Add footer to first page
+                pdf.setPage(1);
+                pdf.text(footerText, footerX, footerY);
+
+                // Add footer to second page
+                pdf.setPage(2);
+                pdf.text(footerText, footerX, footerY);
+
+                pdf.save('stroke_prediction_result.pdf');
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('Failed to generate PDF. Please try again.');
+            }
+        }
+
+        function checkAgain() {
+            // Update to use the Flask route
+            window.location.href = "/prediction";
+        }
+    </script>
 </body>
 </html>

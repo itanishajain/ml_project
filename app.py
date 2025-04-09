@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, make_response
 import numpy as np
 import joblib
 import pandas as pd
-import requests
+from xhtml2pdf import pisa
+from io import BytesIO
+import io
 
 app = Flask(__name__)
 
@@ -47,31 +49,53 @@ def predict():
             "Smoking Status": request.form['smoking_status'],
             "Alcohol Intake": request.form['alcohol_intake'],
             "Physical Activity": request.form['physical_activity'],
-            "Stroke History": int(request.form.get('stroke_history', 0)),  # Default to 0 if not provided
-            "Family History of Stroke": int(request.form.get('family_history', 0))  # Default to 0 if not provided
+            "Stroke History": int(request.form.get('stroke_history', 0)),
+            "Family History of Stroke": int(request.form.get('family_history', 0))
         }
-        
+
         # Encode categorical variables
         for col in label_encoders:
             if col in user_input:
                 user_input[col] = label_encoders[col].transform([user_input[col]])[0]
 
-        # Convert input to a DataFrame
+        # Convert input to DataFrame and reorder
         input_df = pd.DataFrame([user_input])
-
-        # Reorder columns to match the training data
-        input_df = input_df[feature_names]  # Use saved feature names
-        
-        # Standardize numerical values
+        input_df = input_df[feature_names]
         input_df_scaled = scaler.transform(input_df)
 
-        # Predict using the model
+        # Predict
         prediction = model.predict(input_df_scaled)
-        result = "High Risk of Stroke" if prediction[0] == 1 else "Low Risk of Stroke"
+        predicted_class = int(prediction[0])
+        result = "High Risk of Stroke" if predicted_class == 1 else "Low Risk of Stroke"
 
-        return render_template('result.html', prediction=result, user_input=user_input)
+        # Convert all user_input values to string to avoid int64 serialization issues
+        user_input_str = {k: str(v) for k, v in user_input.items()}
+
+        return render_template('result.html', prediction=result, user_input=user_input_str)
+
     except Exception as e:
         return f"Error: {e}", 400
+
+@app.route("/download_pdf", methods=["POST"])
+def download_pdf():
+    prediction = request.form.get("prediction")
+    user_input = {key: request.form[key] for key in request.form if key != "prediction"}
+
+    # Render the PDF template
+    rendered = render_template("pdf_template.html", prediction=prediction, user_input=user_input)
+
+    # Convert rendered HTML to PDF
+    # Convert rendered HTML to PDF
+    pdf = BytesIO()
+    pisa_status = pisa.CreatePDF(BytesIO(rendered.encode("utf-8")), dest=pdf)
+
+    if pisa_status.err:
+        return "Error creating PDF", 500
+
+    response = make_response(pdf.getvalue())
+    response.headers["Content-Type"] = "application/pdf"
+    response.headers["Content-Disposition"] = "attachment; filename=stroke_prediction_result.pdf"
+    return response
 
 if __name__ == "__main__":
     app.run(debug=True)
