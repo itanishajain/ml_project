@@ -12,489 +12,596 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-      /* Base styles */
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Oxygen, Ubuntu, Cantarell, sans-serif;
-        background-color: #f3f4f6;
-        color: #1f2937;
-        line-height: 1.5;
-        min-height: 100vh;
-        padding: 3rem 1rem;
-        font-size: 16px;
-      }
-
-      .container {
-        max-width: 64rem;
-        margin: 0 auto;
-        background-color: white;
-        border-radius: 0.75rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-          0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        padding: 2rem;
-      }
-
-      h1 {
-        font-size: 2.5rem;
-        font-weight: bold;
-        text-align: center;
-        color: #1f2937;
-        margin-bottom: 2rem;
-      }
-
-      h2 {
-        font-size: 1.75rem;
-        margin-bottom: 0.75rem;
-      }
-
-      h3 {
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 1.25rem;
-      }
-
-      p {
-        font-size: 1.125rem;
-        line-height: 1.6;
-      }
-
-      /* Result box styles */
-      .result-box {
-        padding: 2rem;
-        border-radius: 0.5rem;
-        margin-bottom: 2.5rem;
-      }
-
-      .result-box.safe {
-        background-color: #ecfdf5;
-        border: 1px solid #a7f3d0;
-      }
-
-      .result-box.safe h2 {
-        color: #047857;
-      }
-
-      .result-box.safe p {
-        color: #065f46;
-      }
-
-      .result-box.danger {
-        background-color: #fef2f2;
-        border: 1px solid #fecaca;
-      }
-
-      .result-box.danger h2 {
-        color: #b91c1c;
-      }
-
-      .result-box.danger p {
-        color: #991b1b;
-      }
-
-      /* Summary section styles */
-      .summary-section {
-        margin-bottom: 2.5rem;
-      }
-
-      .summary-box {
-        background-color: #f9fafb;
-        border-radius: 0.5rem;
-        padding: 2rem;
-      }
-
-      /* Tips section styles */
-      .tips-section {
-        margin-bottom: 2.5rem;
-      }
-
-      .tips-box {
-        padding: 2rem;
-        border-radius: 0.5rem;
-      }
-
-      .tips-box.safe {
-        background-color: #ecfdf5;
-        border: 1px solid #a7f3d0;
-      }
-
-      .tips-box.danger {
-        background-color: #fef2f2;
-        border: 1px solid #fecaca;
-      }
-
-      .tips-box ul {
-        list-style-type: none;
-        padding: 0;
-      }
-
-      .tips-box li {
-        margin-bottom: 1rem;
-        padding-left: 1.75rem;
-        position: relative;
-        font-size: 1.125rem;
-      }
-
-      .tips-box li:before {
-        content: "•";
-        position: absolute;
-        left: 0;
-        color: #047857;
-        font-size: 1.25rem;
-      }
-
-      .tips-box.danger li:before {
-        color: #b91c1c;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      tr {
-        border-bottom: 1px solid #e5e7eb;
-      }
-
-      tr:last-child {
-        border-bottom: none;
-      }
-
-      td {
-        padding: 1rem 0;
-        font-size: 1.125rem;
-      }
-
-      td.label {
-        font-weight: 500;
-        color: #4b5563;
-      }
-
-      /* Chart section styles */
-      .chart-section {
-        margin-bottom: 2.5rem;
-      }
-
-      .chart-box {
-        background-color: #f9fafb;
-        border-radius: 0.5rem;
-        padding: 2rem;
-      }
-
-      /* Button styles */
-      .button-group {
-        display: flex;
-        justify-content: center;
-        gap: 1.25rem;
-        margin-bottom: 2.5rem;
-      }
-
-      .btn {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 1rem 2rem;
-        border: none;
-        border-radius: 0.5rem;
-        font-weight: 500;
-        font-size: 1.125rem;
-        cursor: pointer;
-        transition: background-color 0.2s;
-      }
-
-      .btn svg {
-        width: 1.5rem;
-        height: 1.5rem;
-      }
-
-      .btn-red {
-        background-color: #dc2626;
-        color: white;
-      }
-
-      .btn-red:hover {
-        background-color: #b91c1c;
-      }
-
-      .btn-green {
-        background-color: #059669;
-        color: white;
-      }
-
-      .btn-green:hover {
-        background-color: #047857;
-      }
-
-      .btn-blue {
-        background-color: #3b82f6;
-        color: white;
-      }
-
-      .btn-blue:hover {
-        background-color: #2563eb;
-      }
-
-      .recommendations-section {
-        margin: 2.5rem 0;
-        opacity: 0;
-        transition: opacity 0.5s ease-in-out;
-      }
-
-      .recommendations-section h3 {
-        color: #1f2937;
-        text-align: center;
-        margin-bottom: 2rem;
-        font-size: 1.875rem;
-      }
-
-      .recommendations-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-        margin-top: 1.5rem;
-      }
-
-      .recommendation-card {
-        background-color: #ffffff;
-        border-radius: 1rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-          0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        overflow: hidden;
-        transition: transform 0.3s ease-in-out;
-      }
-
-      .recommendation-card:hover {
-        transform: translateY(-5px);
-      }
-
-      .card-header {
-        background-color: #dc2626;
-        color: white;
-        padding: 1.25rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
-      .card-header i {
-        font-size: 1.75rem;
-        color: white;
-      }
-
-      .card-header h4 {
-        margin: 0;
-        color: white;
-        font-size: 1.25rem;
-        font-weight: 600;
-      }
-
-      .card-content {
-        padding: 1.5rem;
-        color: #4b5563;
-        font-size: 1.125rem;
-        line-height: 1.75;
-      }
-
-      /* Card specific colors */
-      .recommendation-card:nth-child(1) .card-header {
-        background-color: #2563eb;
-      }
-
-      .recommendation-card:nth-child(2) .card-header {
-        background-color: #059669;
-      }
-
-      .recommendation-card:nth-child(3) .card-header {
-        background-color: #dc2626;
-      }
-
-      .recommendation-card:nth-child(4) .card-header {
-        background-color: #7c3aed;
-      }
-      
-
-      /* Button styles */
-      #recommendBtn {
-        background-color: #2563eb;
-        color: white;
-        padding: 1rem 2rem;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin: 0 auto;
-        transition: background-color 0.3s ease;
-      }
-
-      #recommendBtn:hover {
-        background-color: #1d4ed8;
-      }
-
-      #recommendBtn i {
-        font-size: 1.25rem;
-      }
-
-      #recommendBtn.loading {
-        opacity: 0.7;
-        cursor: not-allowed;
-      }
-
-      /* Animation for recommendations appearance */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .recommendations-section.visible {
-        animation: fadeIn 0.5s ease-out forwards;
-      }
-
-      .loading-content {
-        text-align: center;
-        padding: 2rem;
-        color: #6b7280;
-    }
-    
-    .loading-content i {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-        color: #2563eb;
-    }
-    
-    .loading-content p {
-        font-size: 1rem;
-        margin: 0;
-    }
-    
-    .card-content {
-        padding: 1.5rem;
-        color: #4b5563;
-        font-size: 1.125rem;
-        line-height: 1.75;
-    }
-    
-    .card-content br {
-        display: block;
-        margin-top: 0.75rem;
-    }
-    
-    /* Improve bullet points styling */
-    .card-content p {
-        position: relative;
-        padding-left: 1.5rem;
-        margin-bottom: 0.75rem;
-    }
-    
-    .card-content p:before {
-        content: "•";
-        position: absolute;
-        left: 0;
-        color: #2563eb;
-    }
-    
-    /* Card animations */
-    .recommendation-card {
-        opacity: 0;
-        transform: translateY(20px);
-        animation: fadeInUp 0.5s ease forwards;
-    }
-    
-    @keyframes fadeInUp {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .recommendation-card:nth-child(1) { animation-delay: 0.1s; }
-    .recommendation-card:nth-child(2) { animation-delay: 0.2s; }
-    .recommendation-card:nth-child(3) { animation-delay: 0.3s; }
-    .recommendation-card:nth-child(4) { animation-delay: 0.4s; }
-    
-    /* Hover effects */
-    .recommendation-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Card header specific styles */
-    .recommendation-card:nth-child(1) .card-header { background-color: #2563eb; }
-    .recommendation-card:nth-child(2) .card-header { background-color: #059669; }
-    .recommendation-card:nth-child(3) .card-header { background-color: #dc2626; }
-    .recommendation-card:nth-child(4) .card-header { background-color: #7c3aed; }
-
-      /* Footer styles */
-      footer {
-        text-align: center;
-        color: #6b7280;
-        font-size: 1rem;
-        margin-top: 2.5rem;
-      }
-
-      @media print {
-        .container {
+        /* Base styles */
+        * {
           margin: 0;
-          padding: 30px;
-          box-shadow: none;
-        }
-
-        .no-print {
-          display: none;
-        }
-
-        body {
-          background: white;
           padding: 0;
-          font-size: 14pt;
+          box-sizing: border-box;
         }
 
-        .chart-box {
-          page-break-inside: avoid;
-        }
-
-        .summary-section {
-          page-break-inside: avoid;
-        }
-
-        .tips-section {
-          page-break-inside: avoid;
-        }
-      }
-
-      /* Responsive design */
-      @media (max-width: 640px) {
         body {
-          padding: 1rem;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            Oxygen, Ubuntu, Cantarell, sans-serif;
+          background-color: #f3f4f6;
+          color: #1f2937;
+          line-height: 1.5;
+          min-height: 100vh;
+          padding: 3rem 1rem;
+          font-size: 16px;
         }
 
         .container {
-          padding: 1.5rem;
+          max-width: 64rem;
+          margin: 0 auto;
+          background-color: white;
+          border-radius: 0.75rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          padding: 2rem;
         }
 
         h1 {
-          font-size: 2rem;
+          font-size: 2.5rem;
+          font-weight: bold;
+          text-align: center;
+          color: #1f2937;
+          margin-bottom: 2rem;
         }
 
+        h2 {
+          font-size: 1.75rem;
+          margin-bottom: 0.75rem;
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          font-weight: 600;
+          margin-bottom: 1.25rem;
+        }
+
+        p {
+          font-size: 1.125rem;
+          line-height: 1.6;
+        }
+
+        /* Result box styles */
+        .result-box {
+          padding: 2rem;
+          border-radius: 0.5rem;
+          margin-bottom: 2.5rem;
+        }
+
+        .result-box.safe {
+          background-color: #ecfdf5;
+          border: 1px solid #a7f3d0;
+        }
+
+        .result-box.safe h2 {
+          color: #047857;
+        }
+
+        .result-box.safe p {
+          color: #065f46;
+        }
+
+        .result-box.danger {
+          background-color: #fef2f2;
+          border: 1px solid #fecaca;
+        }
+
+        .result-box.danger h2 {
+          color: #b91c1c;
+        }
+
+        .result-box.danger p {
+          color: #991b1b;
+        }
+
+        /* Summary section styles */
+        .summary-section {
+          margin-bottom: 2.5rem;
+        }
+
+        .summary-box {
+          background-color: #f9fafb;
+          border-radius: 0.5rem;
+          padding: 2rem;
+        }
+
+        /* Tips section styles */
+        .tips-section {
+          margin-bottom: 2.5rem;
+        }
+
+        .tips-box {
+          padding: 2rem;
+          border-radius: 0.5rem;
+        }
+
+        .tips-box.safe {
+          background-color: #ecfdf5;
+          border: 1px solid #a7f3d0;
+        }
+
+        .tips-box.danger {
+          background-color: #fef2f2;
+          border: 1px solid #fecaca;
+        }
+
+        .tips-box ul {
+          list-style-type: none;
+          padding: 0;
+        }
+
+        .tips-box li {
+          margin-bottom: 1rem;
+          padding-left: 1.75rem;
+          position: relative;
+          font-size: 1.125rem;
+        }
+
+        .tips-box li:before {
+          content: "•";
+          position: absolute;
+          left: 0;
+          color: #047857;
+          font-size: 1.25rem;
+        }
+
+        .tips-box.danger li:before {
+          color: #b91c1c;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        tr {
+          border-bottom: 1px solid #e5e7eb;
+        }
+
+        tr:last-child {
+          border-bottom: none;
+        }
+
+        td {
+          padding: 1rem 0;
+          font-size: 1.125rem;
+        }
+
+        td.label {
+          font-weight: 500;
+          color: #4b5563;
+        }
+
+        /* Chart section styles */
+        .chart-section {
+          margin-bottom: 2.5rem;
+        }
+
+        .chart-box {
+          background-color: #f9fafb;
+          border-radius: 0.5rem;
+          padding: 2rem;
+        }
+
+        /* Button styles */
         .button-group {
-          flex-direction: column;
+          display: flex;
+          justify-content: center;
+          gap: 1.25rem;
+          margin-bottom: 2.5rem;
         }
 
         .btn {
-          width: 100%;
-          justify-content: center;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 1rem 2rem;
+          border: none;
+          border-radius: 0.5rem;
+          font-weight: 500;
+          font-size: 1.125rem;
+          cursor: pointer;
+          transition: background-color 0.2s;
         }
+
+        .btn svg {
+          width: 1.5rem;
+          height: 1.5rem;
+        }
+
+        .btn-red {
+          background-color: #dc2626;
+          color: white;
+        }
+
+        .btn-red:hover {
+          background-color: #b91c1c;
+        }
+
+        .btn-green {
+          background-color: #059669;
+          color: white;
+        }
+
+        .btn-green:hover {
+          background-color: #047857;
+        }
+
+        .btn-blue {
+          background-color: #3b82f6;
+          color: white;
+        }
+
+        .btn-blue:hover {
+          background-color: #2563eb;
+        }
+
+        .recommendations-section {
+          margin: 2.5rem 0;
+          opacity: 0;
+          transition: opacity 0.5s ease-in-out;
+        }
+
+        .recommendations-section h3 {
+          color: #1f2937;
+          text-align: center;
+          margin-bottom: 2rem;
+          font-size: 1.875rem;
+        }
+
+        .recommendations-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 1.5rem;
+          margin-top: 1.5rem;
+        }
+
+        .recommendation-card {
+          background-color: #ffffff;
+          border-radius: 1rem;
+          border: 1px solid rgb(2, 2, 2);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          overflow: hidden;
+          transition: transform 0.3s ease-in-out;
+        }
+
+        .recommendation-card:hover {
+          transform: translateY(-5px);
+        }
+
+        .card-header {
+          background-color: #dc2626;
+          color: white;
+          padding: 1.25rem;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .card-header i {
+          font-size: 1.75rem;
+          color: white;
+        }
+
+        .card-header h4 {
+          margin: 0;
+          color: white;
+          font-size: 1.25rem;
+          font-weight: 600;
+        }
+
+        .card-content {
+          padding: 1.5rem;
+          color: #4b5563;
+          font-size: 1.125rem;
+          line-height: 1.75;
+        }
+
+        /* Card specific colors */
+        .recommendation-card:nth-child(1) .card-header {
+          background-color: #2563eb;
+        }
+
+        .recommendation-card:nth-child(2) .card-header {
+          background-color: #059669;
+        }
+
+        .recommendation-card:nth-child(3) .card-header {
+          background-color: #dc2626;
+        }
+
+        .recommendation-card:nth-child(4) .card-header {
+          background-color: #7c3aed;
+        }
+
+        /* Button styles */
+        #recommendBtn {
+          background-color: #2563eb;
+          color: white;
+          padding: 1rem 2rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          margin: 0 auto;
+          transition: background-color 0.3s ease;
+        }
+
+        #recommendBtn:hover {
+          background-color: #1d4ed8;
+        }
+
+        #recommendBtn i {
+          font-size: 1.25rem;
+        }
+
+        #recommendBtn.loading {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
+        /* Animation for recommendations appearance */
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .recommendations-section.visible {
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .loading-content {
+          text-align: center;
+          padding: 2rem;
+          color: #6b7280;
+        }
+
+        .loading-content i {
+          font-size: 2rem;
+          margin-bottom: 1rem;
+          color: #2563eb;
+        }
+
+        .loading-content p {
+          font-size: 1rem;
+          margin: 0;
+        }
+
+        .card-content {
+          padding: 1.5rem;
+          color: #4b5563;
+          font-size: 1.125rem;
+          line-height: 1.75;
+        }
+
+        .card-content br {
+          display: block;
+          margin-top: 0.75rem;
+        }
+
+        /* Improve bullet points styling */
+        .card-content p {
+          position: relative;
+          padding-left: 1.5rem;
+          margin-bottom: 0.75rem;
+        }
+
+        .card-content p:before {
+          content: "•";
+          position: absolute;
+          left: 0;
+          color: #2563eb;
+        }
+
+        /* Card animations */
+        .recommendation-card {
+          opacity: 0;
+          transform: translateY(20px);
+          animation: fadeInUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .recommendation-card:nth-child(1) {
+          animation-delay: 0.1s;
+        }
+        .recommendation-card:nth-child(2) {
+          animation-delay: 0.2s;
+        }
+        .recommendation-card:nth-child(3) {
+          animation-delay: 0.3s;
+        }
+        .recommendation-card:nth-child(4) {
+          animation-delay: 0.4s;
+        }
+
+        /* Hover effects */
+        .recommendation-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Card header specific styles */
+        .recommendation-card:nth-child(1) .card-header {
+          background-color: #2563eb;
+        }
+        .recommendation-card:nth-child(2) .card-header {
+          background-color: #059669;
+        }
+        .recommendation-card:nth-child(3) .card-header {
+          background-color: #dc2626;
+        }
+        .recommendation-card:nth-child(4) .card-header {
+          background-color: #7c3aed;
+        }
+
+        /* Footer styles */
+        footer {
+          text-align: center;
+          color: #6b7280;
+          font-size: 1rem;
+          margin-top: 2.5rem;
+        }
+
+        @media print {
+          .container {
+            margin: 0;
+            padding: 30px;
+            box-shadow: none;
+          }
+
+          .no-print {
+            display: none;
+          }
+
+          body {
+            background: white;
+            padding: 0;
+            font-size: 14pt;
+          }
+
+          .chart-box {
+            page-break-inside: avoid;
+          }
+
+          .summary-section {
+            page-break-inside: avoid;
+          }
+
+          .tips-section {
+            page-break-inside: avoid;
+          }
+        }
+
+        /* Responsive design */
+        @media (max-width: 640px) {
+          body {
+            padding: 1rem;
+          }
+
+          .container {
+            padding: 1.5rem;
+          }
+
+          h1 {
+            font-size: 2rem;
+          }
+
+          .button-group {
+            flex-direction: column;
+          }
+
+          .btn {
+            width: 100%;
+            justify-content: center;
+          }
+        }
+        .risk-chart-section {
+          margin: 2.5rem 0;
+          background: white;
+          border-radius: 1rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          padding: 2rem;
+      }
+
+      .risk-chart-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 3rem;
+          flex-wrap: wrap;
+      }
+
+      .risk-chart {
+          width: 300px;
+          height: 300px;
+          position: relative;
+      }
+
+      .risk-details {
+          flex: 1;
+          min-width: 250px;
+          max-width: 400px;
+      }
+
+      .risk-details h3 {
+          color: #1f2937;
+          margin-bottom: 1.5rem;
+          font-size: 1.5rem;
+      }
+
+      .risk-percentage-display {
+          text-align: center;
+          margin-bottom: 2rem;
+      }
+
+      .percentage-number {
+          font-size: 3.5rem;
+          font-weight: 700;
+          color: {{ 'High' in prediction and '#dc2626' or '#059669' }};
+          display: block;
+          line-height: 1;
+      }
+
+      .percentage-label {
+          font-size: 1.125rem;
+          color: #6b7280;
+          margin-top: 0.5rem;
+          display: block;
+      }
+
+      .risk-legend {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+      }
+
+      .legend-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+      }
+
+      .legend-color {
+          width: 1rem;
+          height: 1rem;
+          border-radius: 0.25rem;
+      }
+
+      .legend-label {
+          font-size: 1rem;
+          color: #4b5563;
+      }
+
+      @media (max-width: 768px) {
+          .risk-chart-container {
+              flex-direction: column;
+              gap: 2rem;
+          }
+
+          .risk-details {
+              text-align: center;
+          }
+
+          .risk-legend {
+              justify-content: center;
+          }
       }
     </style>
   </head>
@@ -502,14 +609,46 @@
     <div class="container" id="capture-container">
       <h1>Stroke Prediction Result</h1>
 
-      <div class="result-box safe">
-        <h2>Low Risk of Stroke Detected</h2>
+      <div
+        class="result-box {{ 'danger' if 'High' in prediction else 'safe' }}"
+      >
+        <h2>{{ prediction }}</h2>
         <p>
-          You are at low risk of stroke. Maintain a healthy lifestyle and
-          regular check-ups to stay healthy.
+          {% if 'High' in prediction %} Your risk assessment indicates a higher
+          risk of stroke. Please consult with a healthcare professional and
+          follow the recommended guidelines. {% else %} Your risk assessment
+          indicates a lower risk of stroke. Maintain a healthy lifestyle and
+          regular check-ups to stay healthy. {% endif %}
         </p>
+        <p class="risk-percentage">Risk Percentage: {{ risk_percentage }}%</p>
       </div>
 
+      <div class="risk-chart-section">
+        <div class="risk-chart-container">
+          <div class="risk-chart">
+            <canvas id="riskChart"></canvas>
+          </div>
+          <div class="risk-details">
+            <h3>Risk Analysis</h3>
+            <div class="risk-percentage-display">
+              <span class="percentage-number">{{ risk_percentage }}%</span>
+              <span class="percentage-label">Risk Level</span>
+            </div>
+            <div class="risk-legend">
+              <div class="legend-item">
+                <span class="legend-color" style="background: #dc2626"></span>
+                <span class="legend-label">Risk Factor</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color" style="background: #e5e7eb"></span>
+                <span class="legend-label">Safe Zone</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Replace the existing summary-section div with this -->
       <div class="summary-section">
         <h3>Your Input Summary</h3>
         <div class="summary-box">
@@ -517,51 +656,58 @@
             <tbody>
               <tr>
                 <td class="label">Gender</td>
-                <td>Male</td>
+                <td>{{ user_input.Gender }}</td>
               </tr>
               <tr>
                 <td class="label">Age</td>
-                <td>45</td>
+                <td>{{ user_input.Age }}</td>
               </tr>
               <tr>
                 <td class="label">Hypertension</td>
-                <td>No</td>
+                <td>{{ 'Yes' if user_input.Hypertension == '1' else 'No' }}</td>
               </tr>
               <tr>
                 <td class="label">Heart Disease</td>
-                <td>No</td>
+                <td>
+                  {{ 'Yes' if user_input['Heart Disease'] == '1' else 'No' }}
+                </td>
               </tr>
               <tr>
                 <td class="label">Marital Status</td>
-                <td>Married</td>
+                <td>{{ user_input['Marital Status'] }}</td>
               </tr>
               <tr>
                 <td class="label">Residence Type</td>
-                <td>Urban</td>
+                <td>{{ user_input['Residence Type'] }}</td>
               </tr>
               <tr>
                 <td class="label">BMI</td>
-                <td>24.5</td>
+                <td>{{ user_input['Body Mass Index (BMI)'] }}</td>
               </tr>
               <tr>
                 <td class="label">Smoking Status</td>
-                <td>Non-smoker</td>
+                <td>{{ user_input['Smoking Status'] }}</td>
               </tr>
               <tr>
                 <td class="label">Alcohol Intake</td>
-                <td>Social Drinker</td>
+                <td>{{ user_input['Alcohol Intake'] }}</td>
               </tr>
               <tr>
                 <td class="label">Physical Activity</td>
-                <td>Moderate</td>
+                <td>{{ user_input['Physical Activity'] }}</td>
               </tr>
               <tr>
                 <td class="label">Stroke History</td>
-                <td>No</td>
+                <td>
+                  {{ 'Yes' if user_input['Stroke History'] == '1' else 'No' }}
+                </td>
               </tr>
               <tr>
                 <td class="label">Family History</td>
-                <td>No</td>
+                <td>
+                  {{ 'Yes' if user_input['Family History of Stroke'] == '1' else
+                  'No' }}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -583,88 +729,92 @@
 
       <!-- Replace the existing recommendations-section div with this -->
       <div class="button-group no-print" style="margin-top: 2rem">
-        <button onclick="showRecommendations()" class="btn btn-primary" id="recommendBtn">
-            <i class="fas fa-lightbulb"></i>
-            Get Personalized Recommendations
+        <button
+          onclick="showRecommendations()"
+          class="btn btn-primary"
+          id="recommendBtn"
+        >
+          <i class="fas fa-lightbulb"></i>
+          Get Personalized Recommendations
         </button>
-    </div>
-    
-    <div class="recommendations-section" id="recommendationsSection" style="display: none">
+      </div>
+
+      <div
+        class="recommendations-section"
+        id="recommendationsSection"
+        style="display: none"
+      >
         <h3>Personalized Recommendations</h3>
         <div class="recommendations-grid">
-            <!-- Physical Activities Card -->
-            <div class="recommendation-card">
-                <div class="card-header">
-                    <i class="fas fa-running"></i>
-                    <h4>Physical Activities</h4>
-                </div>
-                <div class="card-content">
-                    {% if recommendations and recommendations.activities %}
-                        {{ recommendations.activities|safe }}
-                    {% else %}
-                        <div class="loading-content">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Generating personalized activities...</p>
-                        </div>
-                    {% endif %}
-                </div>
+          <!-- Physical Activities Card -->
+          <div class="recommendation-card">
+            <div class="card-header">
+              <i class="fas fa-running"></i>
+              <h4>Physical Activities</h4>
             </div>
-    
-            <!-- Dietary Guidelines Card -->
-            <div class="recommendation-card">
-                <div class="card-header">
-                    <i class="fas fa-utensils"></i>
-                    <h4>Dietary Guidelines</h4>
-                </div>
-                <div class="card-content">
-                    {% if recommendations and recommendations.diet %}
-                        {{ recommendations.diet|safe }}
-                    {% else %}
-                        <div class="loading-content">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Analyzing dietary requirements...</p>
-                        </div>
-                    {% endif %}
-                </div>
+            <div class="card-content">
+              {% if recommendations and recommendations.activities %} {{
+              recommendations.activities|safe }} {% else %}
+              <div class="loading-content">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Generating personalized activities...</p>
+              </div>
+              {% endif %}
             </div>
-    
-            <!-- Lifestyle Changes Card -->
-            <div class="recommendation-card">
-                <div class="card-header">
-                    <i class="fas fa-heart"></i>
-                    <h4>Lifestyle Changes</h4>
-                </div>
-                <div class="card-content">
-                    {% if recommendations and recommendations.lifestyle %}
-                        {{ recommendations.lifestyle|safe }}
-                    {% else %}
-                        <div class="loading-content">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Customizing lifestyle recommendations...</p>
-                        </div>
-                    {% endif %}
-                </div>
+          </div>
+
+          <!-- Dietary Guidelines Card -->
+          <div class="recommendation-card">
+            <div class="card-header">
+              <i class="fas fa-utensils"></i>
+              <h4>Dietary Guidelines</h4>
             </div>
-    
-            <!-- Prevention Measures Card -->
-            <div class="recommendation-card">
-                <div class="card-header">
-                    <i class="fas fa-shield-alt"></i>
-                    <h4>Prevention Measures</h4>
-                </div>
-                <div class="card-content">
-                    {% if recommendations and recommendations.prevention %}
-                        {{ recommendations.prevention|safe }}
-                    {% else %}
-                        <div class="loading-content">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Preparing prevention strategies...</p>
-                        </div>
-                    {% endif %}
-                </div>
+            <div class="card-content">
+              {% if recommendations and recommendations.diet %} {{
+              recommendations.diet|safe }} {% else %}
+              <div class="loading-content">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Analyzing dietary requirements...</p>
+              </div>
+              {% endif %}
             </div>
+          </div>
+
+          <!-- Lifestyle Changes Card -->
+          <div class="recommendation-card">
+            <div class="card-header">
+              <i class="fas fa-heart"></i>
+              <h4>Lifestyle Changes</h4>
+            </div>
+            <div class="card-content">
+              {% if recommendations and recommendations.lifestyle %} {{
+              recommendations.lifestyle|safe }} {% else %}
+              <div class="loading-content">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Customizing lifestyle recommendations...</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Prevention Measures Card -->
+          <div class="recommendation-card">
+            <div class="card-header">
+              <i class="fas fa-shield-alt"></i>
+              <h4>Prevention Measures</h4>
+            </div>
+            <div class="card-content">
+              {% if recommendations and recommendations.prevention %} {{
+              recommendations.prevention|safe }} {% else %}
+              <div class="loading-content">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Preparing prevention strategies...</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
         </div>
-    </div>
+      </div>
 
       <div
         class="recommendations-section"
@@ -794,260 +944,335 @@
     </div>
 
     <script>
-      // Initialize Chart.js
-      const ctx = document.getElementById("healthChart").getContext("2d");
+                  // Initialize Chart.js
+                  const ctx = document.getElementById("healthChart").getContext("2d");
 
-      const chartData = {
-        labels: [
-          "Hypertension",
-          "Heart Disease",
-          "BMI",
-          "Physical Activity",
-          "Smoking Risk",
-          "Alcohol Risk",
-          "Age Risk",
-          "Family History",
-        ],
-        datasets: [
-          {
-            label: "Health Indicators",
-            data: [0.2, 0.3, 0.6, 0.8, 0.1, 0.4, 0.5, 0.2],
-            backgroundColor: "#dc2626",
-            borderRadius: 10,
-          },
-        ],
+                  // Update the chartData object in the script section
+            const chartData = {
+              labels: [
+                  "Hypertension",
+                  "Heart Disease",
+                  "BMI Risk",
+                  "Physical Activity",
+                  "Smoking Risk",
+                  "Alcohol Risk",
+                  "Age Risk",
+                  "Family History",
+              ],
+              datasets: [{
+                  label: "Health Indicators",
+                  data: [
+                      {{ health_indicators['Hypertension'] }},
+                      {{ health_indicators['Heart Disease'] }},
+                      {{ health_indicators['BMI Risk'] }},
+                      {{ health_indicators['Physical Activity'] }},
+                      {{ health_indicators['Smoking Risk'] }},
+                      {{ health_indicators['Alcohol Risk'] }},
+                      {{ health_indicators['Age Risk'] }},
+                      {{ health_indicators['Family History'] }}
+                  ],
+                  backgroundColor: "#dc2626",
+                  borderRadius: 10,
+              }]
+            };
+
+                  const chartOptions = {
+                    responsive: true,
+                    plugins: {
+                      legend: {
+                        display: true,
+                        labels: { color: "black" },
+                      },
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                        max: 1,
+                        ticks: {
+                          callback: function (value) {
+                            return value * 100 + "%";
+                          },
+                        },
+                      },
+                    },
+                    tooltips: {
+                      callbacks: {
+                        label: function (tooltipItem) {
+                          return `Risk Level: ${(tooltipItem.value * 100).toFixed(1)}%`;
+                        },
+                      },
+                    },
+                  };
+
+                  new Chart(ctx, {
+                    type: "bar",
+                    data: chartData,
+                    options: chartOptions,
+                  });
+
+                  async function downloadImage() {
+                    const element = document.getElementById("capture-container");
+
+                    try {
+                      const canvas = await html2canvas(element, {
+                        scale: 2,
+                        backgroundColor: "#ffffff",
+                        logging: false,
+                        useCORS: true,
+                      });
+
+                      const link = document.createElement("a");
+                      link.download = "stroke_result.png";
+                      link.href = canvas.toDataURL("image/png");
+                      link.click();
+                    } catch (error) {
+                      console.error("Error generating image:", error);
+                      alert("Failed to generate image. Please try again.");
+                    }
+                  }
+
+                  async function downloadPDF() {
+                    try {
+                      const { jsPDF } = window.jspdf;
+                      const pdf = new jsPDF({
+                        orientation: "portrait",
+                        unit: "mm",
+                        format: "a4",
+                      });
+
+                      // A4 dimensions in mm
+                      const pageWidth = 210;
+                      const pageHeight = 297;
+                      const margin = 25; // Increased margin for better readability
+
+                      // Add title to first page
+                      pdf.setFontSize(28); // Increased font size
+                      pdf.setTextColor(0);
+                      const title = "Stroke Prediction Result";
+                      const titleWidth =
+                        (pdf.getStringUnitWidth(title) * pdf.getFontSize()) /
+                        pdf.internal.scaleFactor;
+                      const titleX = (pageWidth - titleWidth) / 2;
+                      pdf.text(title, titleX, margin + 10);
+
+                      // Capture and add the result box
+                      const resultElement = document.querySelector(".result-box");
+                      const resultCanvas = await html2canvas(resultElement, {
+                        scale: 3, // Increased scale for better quality
+                        backgroundColor: "#ffffff",
+                        logging: false,
+                        useCORS: true,
+                      });
+
+                      const resultRatio = resultCanvas.height / resultCanvas.width;
+                      const resultWidth = pageWidth - 2 * margin;
+                      const resultHeight = resultWidth * resultRatio;
+
+                      pdf.addImage(
+                        resultCanvas.toDataURL("image/png"),
+                        "PNG",
+                        margin,
+                        margin + 20,
+                        resultWidth,
+                        resultHeight
+                      );
+
+                      // Capture and add the summary section
+                      const summaryElement = document.querySelector(".summary-section");
+                      const summaryCanvas = await html2canvas(summaryElement, {
+                        scale: 3, // Increased scale for better quality
+                        backgroundColor: "#ffffff",
+                        logging: false,
+                        useCORS: true,
+                      });
+
+                      const summaryRatio = summaryCanvas.height / summaryCanvas.width;
+                      const summaryWidth = pageWidth - 2 * margin;
+                      const summaryHeight = summaryWidth * summaryRatio;
+
+                      pdf.addImage(
+                        summaryCanvas.toDataURL("image/png"),
+                        "PNG",
+                        margin,
+                        margin + 20 + resultHeight + 15,
+                        summaryWidth,
+                        summaryHeight
+                      );
+
+                      // Add page 2
+                      pdf.addPage();
+
+                      // Capture and add the tips section
+                      const tipsElement = document.querySelector(".tips-section");
+                      const tipsCanvas = await html2canvas(tipsElement, {
+                        scale: 3, // Increased scale for better quality
+                        backgroundColor: "#ffffff",
+                        logging: false,
+                        useCORS: true,
+                      });
+
+                      const tipsRatio = tipsCanvas.height / tipsCanvas.width;
+                      const tipsWidth = pageWidth - 2 * margin;
+                      const tipsHeight = tipsWidth * tipsRatio;
+
+                      pdf.addImage(
+                        tipsCanvas.toDataURL("image/png"),
+                        "PNG",
+                        margin,
+                        margin,
+                        tipsWidth,
+                        tipsHeight
+                      );
+
+                      // Capture and add the chart section
+                      const chartElement = document.querySelector(".chart-section");
+                      const chartCanvas = await html2canvas(chartElement, {
+                        scale: 3, // Increased scale for better quality
+                        backgroundColor: "#ffffff",
+                        logging: false,
+                        useCORS: true,
+                      });
+
+                      const chartRatio = chartCanvas.height / chartCanvas.width;
+                      const chartWidth = pageWidth - 2 * margin;
+                      const chartHeight = chartWidth * chartRatio;
+
+                      pdf.addImage(
+                        chartCanvas.toDataURL("image/png"),
+                        "PNG",
+                        margin,
+                        margin + tipsHeight + 15,
+                        chartWidth,
+                        chartHeight
+                      );
+
+                      // Add footer to both pages
+                      const footerText = "Generated by HeartCure.AI";
+                      pdf.setFontSize(12); // Increased footer font size
+                      pdf.setTextColor(100);
+                      const textWidth =
+                        (pdf.getStringUnitWidth(footerText) * 12) /
+                        pdf.internal.scaleFactor;
+                      const footerX = (pageWidth - textWidth) / 2;
+                      const footerY = pageHeight - 15;
+
+                      // Add footer to first page
+                      pdf.setPage(1);
+                      pdf.text(footerText, footerX, footerY);
+
+                      // Add footer to second page
+                      pdf.setPage(2);
+                      pdf.text(footerText, footerX, footerY);
+
+                      pdf.save("stroke_prediction_result.pdf");
+                    } catch (error) {
+                      console.error("Error generating PDF:", error);
+                      alert("Failed to generate PDF. Please try again.");
+                    }
+                  }
+
+                  function checkAgain() {
+                    // Update to use the Flask route
+                    window.location.href = "/prediction";
+                  }
+                  function showRecommendations() {
+                    const recommendBtn = document.getElementById('recommendBtn');
+                    const recommendationsSection = document.getElementById('recommendationsSection');
+
+                    // Add loading state to button
+                    recommendBtn.disabled = true;
+                    recommendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Recommendations...';
+
+                    // Show recommendations section with animation
+                    recommendationsSection.style.display = 'block';
+                    recommendationsSection.style.opacity = '0';
+
+                    setTimeout(() => {
+                        recommendationsSection.style.opacity = '1';
+                        recommendBtn.style.display = 'none';
+
+                        // Trigger card animations
+                        document.querySelectorAll('.recommendation-card').forEach((card, index) => {
+                            card.style.animationDelay = `${index * 0.1}s`;
+                        });
+                    }, 100);
+                }
+
+                // Initialize Risk Pie Chart
+      const riskCtx = document.getElementById('riskChart').getContext('2d');
+      const riskPercentage = {{ risk_percentage }};
+
+      const riskChartData = {
+          labels: ['Risk', 'Safe'],
+          datasets: [{
+              data: [riskPercentage, 100 - riskPercentage],
+              backgroundColor: [
+                  '#dc2626',
+                  '#e5e7eb'
+              ],
+              borderWidth: 0,
+              borderRadius: 5,
+          }]
       };
 
-      const chartOptions = {
-        responsive: true,
-        plugins: {
-          legend: {
-            display: true,
-            labels: { color: "black" },
-          },
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            max: 1,
-            ticks: {
-              callback: function (value) {
-                return value * 100 + "%";
+      const riskChartOptions = {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+              legend: {
+                  display: false
               },
-            },
+              tooltip: {
+                  enabled: true,
+                  callbacks: {
+                      label: function(context) {
+                          return `${context.raw}%`;
+                      }
+                  }
+              }
           },
-        },
-        tooltips: {
-          callbacks: {
-            label: function (tooltipItem) {
-              return `Risk Level: ${(tooltipItem.value * 100).toFixed(1)}%`;
-            },
-          },
-        },
+          cutout: '70%',
+          animation: {
+              animateScale: true,
+              animateRotate: true,
+              duration: 2000,
+              easing: 'easeInOutQuart'
+          }
       };
 
-      new Chart(ctx, {
-        type: "bar",
-        data: chartData,
-        options: chartOptions,
+      new Chart(riskCtx, {
+          type: 'doughnut',
+          data: riskChartData,
+          options: riskChartOptions
       });
 
-      async function downloadImage() {
-        const element = document.getElementById("capture-container");
+      // Add animation to percentage number
+      document.addEventListener('DOMContentLoaded', function() {
+          const percentageElement = document.querySelector('.percentage-number');
+          const targetPercentage = {{ risk_percentage }};
+          let currentPercentage = 0;
 
-        try {
-          const canvas = await html2canvas(element, {
-            scale: 2,
-            backgroundColor: "#ffffff",
-            logging: false,
-            useCORS: true,
-          });
+          const animatePercentage = () => {
+              if (currentPercentage < targetPercentage) {
+                  currentPercentage += 1;
+                  percentageElement.textContent = `${currentPercentage.toFixed(1)}%`;
+                  requestAnimationFrame(animatePercentage);
+              } else {
+                  percentageElement.textContent = `${targetPercentage.toFixed(1)}%`;
+              }
+          };
 
-          const link = document.createElement("a");
-          link.download = "stroke_result.png";
-          link.href = canvas.toDataURL("image/png");
-          link.click();
-        } catch (error) {
-          console.error("Error generating image:", error);
-          alert("Failed to generate image. Please try again.");
-        }
-      }
-
-      async function downloadPDF() {
-        try {
-          const { jsPDF } = window.jspdf;
-          const pdf = new jsPDF({
-            orientation: "portrait",
-            unit: "mm",
-            format: "a4",
-          });
-
-          // A4 dimensions in mm
-          const pageWidth = 210;
-          const pageHeight = 297;
-          const margin = 25; // Increased margin for better readability
-
-          // Add title to first page
-          pdf.setFontSize(28); // Increased font size
-          pdf.setTextColor(0);
-          const title = "Stroke Prediction Result";
-          const titleWidth =
-            (pdf.getStringUnitWidth(title) * pdf.getFontSize()) /
-            pdf.internal.scaleFactor;
-          const titleX = (pageWidth - titleWidth) / 2;
-          pdf.text(title, titleX, margin + 10);
-
-          // Capture and add the result box
-          const resultElement = document.querySelector(".result-box");
-          const resultCanvas = await html2canvas(resultElement, {
-            scale: 3, // Increased scale for better quality
-            backgroundColor: "#ffffff",
-            logging: false,
-            useCORS: true,
-          });
-
-          const resultRatio = resultCanvas.height / resultCanvas.width;
-          const resultWidth = pageWidth - 2 * margin;
-          const resultHeight = resultWidth * resultRatio;
-
-          pdf.addImage(
-            resultCanvas.toDataURL("image/png"),
-            "PNG",
-            margin,
-            margin + 20,
-            resultWidth,
-            resultHeight
-          );
-
-          // Capture and add the summary section
-          const summaryElement = document.querySelector(".summary-section");
-          const summaryCanvas = await html2canvas(summaryElement, {
-            scale: 3, // Increased scale for better quality
-            backgroundColor: "#ffffff",
-            logging: false,
-            useCORS: true,
-          });
-
-          const summaryRatio = summaryCanvas.height / summaryCanvas.width;
-          const summaryWidth = pageWidth - 2 * margin;
-          const summaryHeight = summaryWidth * summaryRatio;
-
-          pdf.addImage(
-            summaryCanvas.toDataURL("image/png"),
-            "PNG",
-            margin,
-            margin + 20 + resultHeight + 15,
-            summaryWidth,
-            summaryHeight
-          );
-
-          // Add page 2
-          pdf.addPage();
-
-          // Capture and add the tips section
-          const tipsElement = document.querySelector(".tips-section");
-          const tipsCanvas = await html2canvas(tipsElement, {
-            scale: 3, // Increased scale for better quality
-            backgroundColor: "#ffffff",
-            logging: false,
-            useCORS: true,
-          });
-
-          const tipsRatio = tipsCanvas.height / tipsCanvas.width;
-          const tipsWidth = pageWidth - 2 * margin;
-          const tipsHeight = tipsWidth * tipsRatio;
-
-          pdf.addImage(
-            tipsCanvas.toDataURL("image/png"),
-            "PNG",
-            margin,
-            margin,
-            tipsWidth,
-            tipsHeight
-          );
-
-          // Capture and add the chart section
-          const chartElement = document.querySelector(".chart-section");
-          const chartCanvas = await html2canvas(chartElement, {
-            scale: 3, // Increased scale for better quality
-            backgroundColor: "#ffffff",
-            logging: false,
-            useCORS: true,
-          });
-
-          const chartRatio = chartCanvas.height / chartCanvas.width;
-          const chartWidth = pageWidth - 2 * margin;
-          const chartHeight = chartWidth * chartRatio;
-
-          pdf.addImage(
-            chartCanvas.toDataURL("image/png"),
-            "PNG",
-            margin,
-            margin + tipsHeight + 15,
-            chartWidth,
-            chartHeight
-          );
-
-          // Add footer to both pages
-          const footerText = "Generated by HeartCure.AI";
-          pdf.setFontSize(12); // Increased footer font size
-          pdf.setTextColor(100);
-          const textWidth =
-            (pdf.getStringUnitWidth(footerText) * 12) /
-            pdf.internal.scaleFactor;
-          const footerX = (pageWidth - textWidth) / 2;
-          const footerY = pageHeight - 15;
-
-          // Add footer to first page
-          pdf.setPage(1);
-          pdf.text(footerText, footerX, footerY);
-
-          // Add footer to second page
-          pdf.setPage(2);
-          pdf.text(footerText, footerX, footerY);
-
-          pdf.save("stroke_prediction_result.pdf");
-        } catch (error) {
-          console.error("Error generating PDF:", error);
-          alert("Failed to generate PDF. Please try again.");
-        }
-      }
-
-      function checkAgain() {
-        // Update to use the Flask route
-        window.location.href = "/prediction";
-      }
-      function showRecommendations() {
-        const recommendBtn = document.getElementById('recommendBtn');
-        const recommendationsSection = document.getElementById('recommendationsSection');
-        
-        // Add loading state to button
-        recommendBtn.disabled = true;
-        recommendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Recommendations...';
-        
-        // Show recommendations section with animation
-        recommendationsSection.style.display = 'block';
-        recommendationsSection.style.opacity = '0';
-        
-        setTimeout(() => {
-            recommendationsSection.style.opacity = '1';
-            recommendBtn.style.display = 'none';
-            
-            // Trigger card animations
-            document.querySelectorAll('.recommendation-card').forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.1}s`;
-            });
-        }, 100);
-    }
-
-      // Add this to ensure Font Awesome is loaded
-      document.addEventListener("DOMContentLoaded", function () {
-        const link = document.createElement("link");
-        link.rel = "stylesheet";
-        link.href =
-          "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css";
-        document.head.appendChild(link);
+          animatePercentage();
       });
+
+                  // Add this to ensure Font Awesome is loaded
+                  document.addEventListener("DOMContentLoaded", function () {
+                    const link = document.createElement("link");
+                    link.rel = "stylesheet";
+                    link.href =
+                      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css";
+                    document.head.appendChild(link);
+                  });
     </script>
   </body>
 </html>
