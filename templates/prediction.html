@@ -90,6 +90,30 @@
           transform: translateY(0);
         }
       }
+      .btn-processing {
+        position: relative;
+        pointer-events: none;
+        opacity: 0.8;
+      }
+
+      .btn-processing .button-content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-processing .fa-spinner {
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
     </style>
   </head>
   <body>
@@ -225,8 +249,15 @@
               placeholder="Enter BMI"
               required
             />
-            <button type="button" class="btn btn-outline" id="calculateBmiBtn" style="margin-top:1rem;">Calculate your BMI</button>
-            <div id="bmiCalculator" style="display: none; margin-top: 1rem;">
+            <button
+              type="button"
+              class="btn btn-outline"
+              id="calculateBmiBtn"
+              style="margin-top: 1rem"
+            >
+              Calculate your BMI
+            </button>
+            <div id="bmiCalculator" style="display: none; margin-top: 1rem">
               <label for="weight" class="form-label">Weight (kg)</label>
               <input
                 type="number"
@@ -235,25 +266,34 @@
                 id="weight"
                 placeholder="Enter your weight"
               />
-              <label class="form-label" style="margin-top: 0.5rem;">Height</label>
-              <div style="display: flex; gap: 0.5rem;">
+              <label class="form-label" style="margin-top: 0.5rem"
+                >Height</label
+              >
+              <div style="display: flex; gap: 0.5rem">
                 <input
                   type="number"
                   class="form-control"
                   id="heightFeet"
                   placeholder="Feet"
-                  style="flex: 1;"
+                  style="flex: 1"
                 />
                 <input
                   type="number"
                   class="form-control"
                   id="heightInches"
                   placeholder="Inches"
-                  style="flex: 1;"
+                  style="flex: 1"
                 />
               </div>
-              <button type="button" class="btn btn-primary" id="calculateBmiSubmit" style="margin-top: 0.5rem;">Calculate</button>
-              <p id="bmiResult" style="margin-top: 0.5rem; color: #333;"></p>
+              <button
+                type="button"
+                class="btn btn-primary"
+                id="calculateBmiSubmit"
+                style="margin-top: 0.5rem"
+              >
+                Calculate
+              </button>
+              <p id="bmiResult" style="margin-top: 0.5rem; color: #333"></p>
             </div>
           </div>
           <div class="form-group">
@@ -380,13 +420,14 @@
             <button type="button" class="btn btn-primary" id="nextBtn">
               Next
             </button>
+            <!-- Replace the existing submit button with this -->
             <button
               type="submit"
               class="btn btn-primary"
               id="submitBtn"
               style="display: none"
             >
-              Submit
+              <span class="button-content"> Submit </span>
             </button>
           </div>
         </form>
@@ -530,6 +571,27 @@
           bmiResult.textContent = "Please enter valid weight and height.";
         }
       });
+      // Add this after your existing form-related JavaScript
+      document
+        .getElementById("strokeForm")
+        .addEventListener("submit", function (e) {
+          const submitBtn = document.getElementById("submitBtn");
+          const buttonContent = submitBtn.querySelector(".button-content");
+
+          // Save original button content
+          const originalContent = buttonContent.innerHTML;
+
+          // Update button to processing state
+          submitBtn.classList.add("btn-processing");
+          buttonContent.innerHTML =
+            '<i class="fas fa-spinner"></i> Processing...';
+
+          // Add event listener to restore button state if form submission fails
+          window.addEventListener("pageshow", function () {
+            submitBtn.classList.remove("btn-processing");
+            buttonContent.innerHTML = originalContent;
+          });
+        });
     </script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   </body>
